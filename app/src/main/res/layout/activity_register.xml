@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/background">
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:text="Register"
+        android:textColor="@drawable/blue"
+        android:textSize="50sp" />
+    
+    
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                
+                <EditText
+                    android:id="@+id/creat_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/login_shape"
+                    android:hint="Your Userid"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:gravity="center"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/creat_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginTop="13dp"
+                    android:layout_below="@id/creat_id"
+                    android:background="@drawable/login_shape"
+                    android:hint="Your Username"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:gravity="center"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/creat_pwd1"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/creat_account"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/login_shape"
+                    android:hint="Your password"
+                    android:inputType="textPassword"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="16sp" />  
+                    
+                <EditText
+                    android:id="@+id/creat_pwd2"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/creat_pwd1"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/login_shape"
+                    android:hint="Confirm your password"
+                    android:inputType="textPassword"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/registerButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_below="@id/creat_pwd2"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/register_button"
+                    android:padding="8dp"
+                    android:text="Register"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+               
+			</RelativeLayout>
+        </LinearLayout>
+    
+
+</LinearLayout>

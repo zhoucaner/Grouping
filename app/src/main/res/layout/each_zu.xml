@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/title"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
+
+        <ImageButton
+            android:id="@+id/eachzu_back"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="1dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="5"
+            android:background="@android:color/transparent"
+            android:src="@drawable/back_cursor" />
+
+        <TextView
+            android:id="@+id/eachzu_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/eachzu_back"
+            android:background="@drawable/title"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:text="G01"
+            android:textColor="@drawable/white"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/listview_eachzu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/relativeLayout1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/list_group"
+        android:divider="#8C8C8C"
+        android:dividerHeight="0px"
+        android:padding="12dp" >
+    </ListView>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="60dp">
+
+        <Button
+            android:id="@+id/join_eachzu"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="67dp"
+            android:background="@drawable/button_shape"
+            android:text="加入"
+            android:textColor="@drawable/white" />
+
+        <Button
+            android:id="@+id/quit_eachzu"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="67dp"
+            android:background="@drawable/button_shape"
+            android:text="退出"
+            android:textColor="@drawable/white" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

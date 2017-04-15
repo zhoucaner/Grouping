@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/title"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
+
+        <ImageButton
+            android:id="@+id/allzu_back"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="1dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="5"
+            android:background="@android:color/transparent"
+            android:src="@drawable/back_cursor" />
+
+        <TextView
+            android:id="@+id/allzuming"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@id/allzu_back"
+            android:background="@drawable/title"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:text="软工"
+            android:textColor="@drawable/white"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/zu_more_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/more_logo2" />
+    </RelativeLayout>
+    
+    <ListView
+        android:id="@+id/listview_allzu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/relativeLayout1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/list_group"
+        android:divider="#8C8C8C"
+        android:dividerHeight="0px"
+        android:padding="12dp" >
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/title"
+        android:weightSum="2" >
+
+        <TextView
+            android:id="@+id/qunfenzu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="群分组"
+            android:textColor="#aaaaaa"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="48dip"
+            android:layout_gravity="center"
+            android:background="#aaaaaa" />
+
+        <TextView
+            android:id="@+id/qunchengyuan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="群成员"
+            android:textColor="#aaaaaa"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</RelativeLayout>

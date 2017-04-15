@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/content">
+       
+    	<RelativeLayout
+        		android:layout_width="match_parent"
+				android:layout_height="48dp"
+				android:layout_alignParentTop="true"
+				android:background="@drawable/title" 
+				android:focusable="true"
+				android:focusableInTouchMode="true">
+                 
+        	<ImageButton
+           		 android:id="@+id/creatgrp_back"
+           		 android:layout_width="48dp"
+           		 android:layout_height="match_parent"
+           		 android:layout_alignParentLeft="true"
+           		 android:layout_marginBottom="1dp"
+           		 android:layout_marginLeft="1dp"
+           		 android:layout_marginTop="1dp"
+           		 android:layout_weight="5"
+           		 android:background="@android:color/transparent"
+           		 android:src="@drawable/back_cursor" />
+        	
+        	<TextView
+        		android:paddingLeft="10dp"
+        		android:layout_toRightOf="@id/creatgrp_back"
+        		android:layout_width="match_parent"
+      			android:layout_height="match_parent"
+  				android:background="@drawable/title" 
+      			android:gravity="center_vertical"
+      			android:text="新建群"
+      			android:textSize="20sp"
+      			android:textColor="@drawable/white"/>                            
+    	</RelativeLayout>
+    	
+    	<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" 
+            android:layout_marginTop="30dp">
+
+            <ImageView
+                android:layout_width="230dp"
+                android:layout_height="140dp"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/creat_group" />
+
+        </LinearLayout>
+
+		<RelativeLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="28dp" 
+		    android:layout_marginTop="30dp"
+		    android:layout_marginLeft="30dp"
+		    android:layout_marginRight="25dp">
+        	
+		    <TextView
+		        android:id="@+id/qunming"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="群名"
+		        android:textColor="@drawable/blue"
+		        android:textSize="18dp" 
+		        android:paddingTop="3dp"/>
+		    
+		    <EditText
+            	android:paddingLeft="10dp"
+            	android:id="@+id/qunming_edit"
+            	android:layout_toRightOf="@id/qunming"
+          		android:layout_width="match_parent"
+          		android:layout_height="match_parent"
+          		android:layout_marginLeft="5dp"
+          		android:background="@drawable/edit_back"
+          		android:inputType="text"	 
+          		android:maxLines="1"
+          		android:hint="请在此输入群名"
+          		android:textSize="14sp"/>
+		</RelativeLayout>
+		
+		<RelativeLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="28dp" 
+		    android:layout_marginTop="20dp"
+		    android:layout_marginLeft="30dp"
+		    android:layout_marginRight="25dp">
+        	
+		    <TextView
+		        android:id="@+id/mima"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="密码"
+		        android:textColor="@drawable/blue"
+		        android:textSize="18dp" 
+		        android:paddingTop="3dp"/>
+		    
+		    <EditText
+            	android:paddingLeft="10dp"
+            	android:id="@+id/mima_edit"
+            	android:layout_toRightOf="@id/mima"
+          		android:layout_width="match_parent"
+          		android:layout_height="match_parent"
+          		android:layout_marginLeft="5dp"
+          		android:background="@drawable/edit_back"
+          		android:inputType="text"	 
+          		android:maxLines="1"
+          		android:hint="请在此输入密码"
+          		android:textSize="14sp"/>
+		</RelativeLayout>
+		
+		<RelativeLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="28dp" 
+		    android:layout_marginTop="20dp"
+		    android:layout_marginLeft="30dp"
+		    android:layout_marginRight="25dp">
+        	
+		    <TextView
+		        android:id="@+id/mima_confirm"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="确认密码"
+		        android:textColor="@drawable/blue"
+		        android:textSize="18dp" 
+		        android:paddingTop="3dp"/>
+		    
+		    <EditText
+            	android:paddingLeft="10dp"
+            	android:id="@+id/mima_confirm_edit"
+            	android:layout_toRightOf="@id/mima_confirm"
+          		android:layout_width="match_parent"
+          		android:layout_height="match_parent"
+          		android:layout_marginLeft="5dp"
+          		android:background="@drawable/edit_back"
+          		android:inputType="text"	 
+          		android:maxLines="1"
+          		android:hint="请再次输入密码"
+          		android:textSize="14sp"/>
+		</RelativeLayout>
+		
+		<RelativeLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="28dp" 
+		    android:layout_marginTop="20dp"
+		    android:layout_marginLeft="30dp"
+		    android:layout_marginRight="25dp">
+        	
+		    <TextView
+		        android:id="@+id/num_limit"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="人数限制"
+		        android:textColor="@drawable/blue"
+		        android:textSize="18dp" 
+		        android:paddingTop="3dp"/>
+		    
+		    <EditText
+            	android:paddingLeft="10dp"
+            	android:id="@+id/min_num_limit"
+            	android:layout_toRightOf="@id/num_limit"
+          		android:layout_width="100dp"
+          		android:layout_height="match_parent"
+          		android:layout_marginLeft="5dp"
+          		android:background="@drawable/edit_back"
+          		android:inputType="text"	 
+          		android:maxLines="1"
+          		android:hint="如1"
+          		android:textSize="14sp"/>
+		    
+		    <TextView
+		        android:id="@+id/num_limit_line"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_toRightOf="@id/min_num_limit"
+		        android:layout_marginLeft="8dp"
+		        android:text="—"
+		        android:textColor="@drawable/blue"
+		        android:textSize="20dp" 
+		        android:paddingTop="3dp"/>
+		    
+		    <EditText
+            	android:paddingLeft="10dp"
+            	android:id="@+id/max_num_limit"
+            	android:layout_toRightOf="@id/num_limit_line"
+          		android:layout_width="match_parent"
+          		android:layout_height="match_parent"
+          		android:layout_marginLeft="8dp"
+          		android:background="@drawable/edit_back"
+          		android:inputType="text"	 
+          		android:maxLines="1"
+          		android:hint="100"
+          		android:textSize="14sp"/>
+		</RelativeLayout>
+		
+		<LinearLayout
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       	 	android:orientation="horizontal" 
+        	android:layout_marginTop="35dp"
+        	android:weightSum="4">
+
+    	<Button
+        	android:id="@+id/creat_cancel"
+        	android:layout_width="wrap_content"
+        	android:layout_height="35dp"
+        	android:layout_marginLeft="60dp"
+        	android:layout_weight="1"
+        	android:text="Cancel" 
+        	android:background="@drawable/button_shape"
+        	android:textColor="@drawable/white" />
+       
+    	<Button
+        	android:id="@+id/creat_confirm"
+        	android:layout_width="wrap_content"
+        	android:layout_height="35dp"
+        	android:layout_marginLeft="65dp"
+        	android:layout_weight="1"
+        	android:background="@drawable/button_shape"
+        	android:text="Confirm"
+        	android:textColor="@drawable/white" />
+   	 </LinearLayout>
+   	 
+</LinearLayout>

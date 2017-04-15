@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="blue">#576574</drawable> 
+
+    <drawable name="white">#FFFFFF</drawable> 
+
+    <drawable name="black">#ff000000</drawable>
+    
+    <drawable name="background">#2e344a</drawable>
+    
+    <drawable name="grey">#CCCCCC</drawable>
+    
+    <drawable name="content">#dcdcdc</drawable>
+    
+    <drawable name="menu">#2e344a</drawable>
+    
+    <drawable name="title">#4a4f70</drawable>
+
+</resources>

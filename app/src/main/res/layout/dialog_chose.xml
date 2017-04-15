@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="94dip"
+    android:background="@drawable/title"
+    android:orientation="vertical" 
+    android:weightSum="1">
+    
+    <RelativeLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <ImageButton
+            android:id="@+id/newgroup_image"
+			android:layout_width="50dp"
+            android:layout_height="25dp"
+            android:scaleType="centerInside"
+            android:layout_marginLeft="4dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/creat" />
+        
+        <TextView
+        	android:id="@+id/dialog_newgroup"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_toRightOf="@id/newgroup_image"
+        	android:layout_marginLeft="3dp"
+        	android:text="新建群"
+        	android:layout_marginTop="2dp"
+        	android:textColor="#ffffff"
+        	android:textSize="18sp" />
+        
+  	</RelativeLayout>
+  	
+    <View 
+        android:layout_width="match_parent" 
+        android:layout_height="2dip"
+		android:background="#33000000" 
+		android:layout_marginTop="10dip" />
+  	
+    <RelativeLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <ImageButton
+            android:id="@+id/searchgroup_image"
+            android:layout_width="50dp"
+            android:layout_height="22dp"
+            android:layout_marginLeft="4dp"
+            android:scaleType="centerInside"
+            android:background="@android:color/transparent"
+            android:src="@drawable/search" />
+        
+        <TextView
+        	android:id="@+id/dialog_searchgroup"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_toRightOf="@id/searchgroup_image"
+        	android:layout_marginLeft="3dp"
+        	android:text="搜索群"
+        	android:textColor="#ffffff"
+        	android:textSize="18sp" />
+        
+  	</RelativeLayout>
+
+</LinearLayout>

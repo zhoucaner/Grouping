@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/content">
+    
+    	<RelativeLayout
+        		android:id="@+id/searchgrp_bar"  
+        		android:layout_width="match_parent"
+				android:layout_height="52dp"
+				android:layout_alignParentTop="true"
+				android:background="@drawable/title" 
+				android:focusable="true"
+				android:focusableInTouchMode="true">
+                 
+        	<ImageButton
+           		 android:id="@+id/searchgrp_back"
+           		 android:layout_width="48dp"
+           		 android:layout_height="match_parent"
+           		 android:layout_alignParentLeft="true"
+           		 android:layout_marginBottom="1dp"
+           		 android:layout_marginLeft="1dp"
+           		 android:layout_marginTop="1dp"
+           		 android:layout_weight="5"
+           		 android:background="@android:color/transparent"
+           		 android:src="@drawable/back_cursor" />
+        	
+        	<ImageButton
+        	    android:id="@+id/searchgrp_search"
+        	    android:layout_width="32dp"
+        	    android:layout_height="wrap_content"
+        	    android:layout_alignParentRight="true"
+        	    android:layout_centerVertical="true"
+        	    android:layout_marginRight="5dp"
+        	    android:background="@android:color/transparent"
+        	    android:scaleType="centerInside"
+        	    android:src="@android:drawable/ic_menu_search" />
+
+        	<EditText
+        		android:paddingLeft="10dp"
+        		android:id="@+id/searchgrp_edittext"
+        		android:layout_toRightOf="@id/searchgrp_back"
+        		android:layout_toLeftOf="@id/searchgrp_search" 
+        		android:layout_width="match_parent"
+      			android:layout_height="match_parent"
+       			android:layout_weight="1"
+  				android:background="@drawable/title"
+    			android:inputType="text"     
+				android:maxLines="1"
+      			android:gravity="center_vertical"
+      			android:hint="请在此输入群号"
+      			android:textColor="#FCFDFE"
+  				android:imeOptions="actionSearch"/>
+
+        	<ImageButton
+        	    android:id="@+id/searchgrp_delete"
+        	    android:layout_width="18dp"
+        	    android:layout_height="18dp"
+        	    android:layout_alignRight="@+id/searchgrp_edittext"
+        	    android:layout_centerVertical="true"
+        	    android:layout_marginRight="10dp"
+        	    android:background="@android:color/transparent"
+        	    android:scaleType="centerInside"
+        	    android:src="@drawable/delete" />
+                             
+    	</RelativeLayout>
+    	
+    	<ListView 
+        	android:id="@+id/listview_search_group"
+        	android:layout_width="match_parent"
+        	android:layout_marginTop="10dp"
+        	android:layout_marginLeft="10dp"
+        	android:layout_marginRight="10dp"
+       	 	android:padding="12dp"
+        	android:layout_height="wrap_content"
+        	android:background="@drawable/list_group"
+        	android:divider="#8C8C8C"
+        	android:dividerHeight="0px"/>
+    
+
+</LinearLayout>

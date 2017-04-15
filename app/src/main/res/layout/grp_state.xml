@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="270dp"
+    android:layout_height="150.0dip"
+    android:layout_gravity="center"
+    android:background="@drawable/white"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <TextView
+        android:id="@+id/grp_state_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="12dp"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:text="群状态更改"
+        android:textColor="#cc4a4f70"
+        android:textSize="21.0sp" />
+
+    <View
+        android:layout_width="300dp"
+        android:layout_height="0.5dip"
+        android:layout_below="@id/grp_state_title"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/title" />
+
+    <TextView
+        android:id="@+id/grp_state_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/mTogBtn"
+        android:layout_alignLeft="@id/grp_state_title"
+        android:layout_marginLeft="5dp"
+        android:text="关闭群"
+        android:textColor="@drawable/title"
+        android:textSize="20sp" />
+
+    <ToggleButton
+        android:id="@+id/mTogBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/grp_state_title"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="25dp"
+        android:layout_toRightOf="@id/grp_state_text"
+        android:background="@android:color/transparent"
+        android:button="@drawable/toggle_btn"
+        android:scaleType="centerInside"
+        android:text=""
+        android:textOff=""
+        android:textOn="" />
+
+    <TextView
+        android:id="@+id/grp_state_modify_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="14dp"
+        android:layout_marginRight="14dp"
+        android:text="确认更改"
+        android:textColor="@drawable/grey"
+        android:textSize="17sp" />
+
+</RelativeLayout>
