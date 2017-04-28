@@ -219,8 +219,9 @@ public class MainActivity extends Activity implements OnTouchListener {
 
 	@Override
 	protected void onResume() {
-		this.setAdapter();
 		super.onResume();
+		//this.setAdapter();
+		setAdapter();
 	}
 
 	// 下滑菜单的实现

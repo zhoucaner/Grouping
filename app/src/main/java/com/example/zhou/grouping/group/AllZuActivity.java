@@ -26,22 +26,25 @@ import android.widget.ToggleButton;
 
 import com.example.zhou.grouping.R;
 import com.example.zhou.grouping.api.CreateNewSGroupAPI;
+import com.example.zhou.grouping.api.DeleteGroupAPI;
+import com.example.zhou.grouping.api.ExitFromGAndDeleteSGAPI;
+import com.example.zhou.grouping.api.ExitFromGroupAndSGroupAPI;
 import com.example.zhou.grouping.api.IfOwnerOfGroupAPI;
 import com.example.zhou.grouping.api.LoadGroupMembersAPI;
 import com.example.zhou.grouping.api.LoadSGroupAPI;
+import com.example.zhou.grouping.api.SelectIfsgOwnerOfSGroupAPI;
 import com.example.zhou.grouping.application.MyApplication;
 import com.example.zhou.grouping.dao.Database.CreateNewSGroup;
-import com.example.zhou.grouping.dao.Database.ExitFromGroup;
 import com.example.zhou.grouping.dao.Database.JoinInSGroup;
 import com.example.zhou.grouping.dao.Database.SelectIfOpen;
 import com.example.zhou.grouping.dao.Database.SelectMaxSGroupID;
 import com.example.zhou.grouping.dao.Database.SelectNotInSGroup;
 import com.example.zhou.grouping.dao.Database.UpdateIfOpen;
-import com.example.zhou.grouping.dao.Database.deleteGroup;
 import com.example.zhou.grouping.httpBean.CreateNewSGroupResult;
 import com.example.zhou.grouping.httpBean.GroupMembers;
 import com.example.zhou.grouping.httpBean.LoadGroups;
 import com.example.zhou.grouping.httpBean.LoadSGroup;
+import com.example.zhou.grouping.httpBean.NumberResult;
 import com.example.zhou.grouping.httpBean.Result;
 import com.example.zhou.grouping.retrofitUtil.Retrofitutil;
 
@@ -464,7 +467,7 @@ public class AllZuActivity extends Activity {
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                // 判断当前群状态
+                /*// 判断当前群状态
                 SelectIfOpen selectifopen = new SelectIfOpen(
                         Currents.currentSGroup.getgID());
                 FutureTask<Boolean> ft1 = new FutureTask<Boolean>(selectifopen);
@@ -479,8 +482,8 @@ public class AllZuActivity extends Activity {
                 } catch (ExecutionException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                }
-                if (Currents.groupstate == true) {
+                }*/
+        //        if (Currents.groupstate == true) {
                     if (isOwner) {
                         // 如果是群主进行删除群操作
                         final AlertDialog dialog = new AlertDialog.Builder(
@@ -499,10 +502,36 @@ public class AllZuActivity extends Activity {
                                 .findViewById(R.id.ask_confirm);
                         askconfirm
                                 .setOnClickListener(new View.OnClickListener() {
-
                                     @Override
                                     public void onClick(View arg0) {
-                                        // TODO Auto-generated method stub
+                                        Retrofitutil.getmRetrofit()
+                                                .create(DeleteGroupAPI.class)
+                                                .deleteGroup(group.getGID())
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Consumer<NumberResult>() {
+                                                    @Override
+                                                    public void accept(@NonNull NumberResult numberResult) throws Exception {
+                                                        if (numberResult.getResult().equals("6")) {
+                                                            Toast.makeText(
+                                                                    getApplicationContext(),
+                                                                    "解散群成功！",
+                                                                    Toast.LENGTH_SHORT)
+                                                                    .show();
+                                                            AllZuActivity.this.finish();
+                                                        } else if (numberResult.getResult().equals("0")) {
+                                                            Toast.makeText(AllZuActivity.this,
+                                                                    "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                }, new Consumer<Throwable>() {
+                                                    @Override
+                                                    public void accept(@NonNull Throwable throwable) throws Exception {
+                                                        Toast.makeText(AllZuActivity.this,
+                                                                throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                       /* // TODO Auto-generated method stub
                                         deleteGroup deletegroup = new deleteGroup(
                                                 Currents.currentGroup.getgID());
                                         FutureTask<Boolean> ft1 = new FutureTask<Boolean>(
@@ -511,14 +540,160 @@ public class AllZuActivity extends Activity {
 
                                         Toast.makeText(getApplicationContext(),
                                                 "解散成功", Toast.LENGTH_SHORT)
-                                                .show();
-                                        AllZuActivity.this.finish();
+                                                .show();*/
                                     }
                                 });
 
                     } else {
                         // 如果是群成员，进行退出群操作
-                        final AlertDialog dialog = new AlertDialog.Builder(
+                        //但分3种情况，一种是小组组长，一种是普通的小组成员,还有一种是未分组的群成员，后面两种情况统一到一个接口
+                        Retrofitutil.getmRetrofit()
+                                .create(SelectIfsgOwnerOfSGroupAPI.class)
+                                .selectIfsgOwnerOfSGroup(group.getGID(),myApplication.getCustomers().getcID())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Consumer<NumberResult>() {
+                                    @Override
+                                    public void accept(@NonNull NumberResult numberResult) throws Exception {
+                                        if(numberResult.getResult().equals("1")){
+                                            final AlertDialog dialog = new AlertDialog.Builder(
+                                                    AllZuActivity.this).create();
+                                            dialog.show();
+                                            dialog.getWindow()
+                                                    .clearFlags(
+                                                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                                                                    | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                                            Window window = dialog.getWindow();
+                                            window.setContentView(R.layout.ask_delete);
+                                            TextView askdelete = (TextView) window
+                                                    .findViewById(R.id.ask_delete);
+                                            askdelete.setText("你是该群的小组组长，若退群则你所在的小组即刻解散，你确认退群吗？");
+                                            TextView askconfirm = (TextView) window
+                                                    .findViewById(R.id.ask_confirm);
+                                            askconfirm
+                                                    .setOnClickListener(new View.OnClickListener() {
+
+                                                        @Override
+                                                        public void onClick(View arg0) {
+                                                            // TODO Auto-generated method stub
+                                                            Retrofitutil.getmRetrofit()
+                                                                    .create(ExitFromGAndDeleteSGAPI.class)
+                                                                    .exitFromGAndDeleteSG(group.getGID(),myApplication.getCustomers().getcID())
+                                                                    .subscribeOn(Schedulers.io())
+                                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                                    .subscribe(new Consumer<NumberResult>() {
+                                                                        @Override
+                                                                        public void accept(@NonNull NumberResult numberResult) throws Exception {
+                                                                            if (numberResult.getResult().equals("6")) {
+                                                                                Toast.makeText(
+                                                                                        getApplicationContext(),
+                                                                                        "退出群成功！",
+                                                                                        Toast.LENGTH_SHORT)
+                                                                                        .show();
+                                                                                AllZuActivity.this.finish();
+                                                                            } else if (numberResult.getResult().equals("0")) {
+                                                                                Toast.makeText(AllZuActivity.this,
+                                                                                        "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        }
+                                                                    }, new Consumer<Throwable>() {
+                                                                        @Override
+                                                                        public void accept(@NonNull Throwable throwable) throws Exception {
+                                                                            Toast.makeText(AllZuActivity.this,
+                                                                                    throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+
+                                                            /*Database.ExitFromGroup exitfromgroup = new Database.ExitFromGroup(
+                                                                    Currents.currentGroup.getgID(),
+                                                                    Currents.currentCustomer
+                                                                            .getcID());
+                                                            FutureTask<Boolean> ft1 = new FutureTask<Boolean>(
+                                                                    exitfromgroup);
+                                                            new Thread(ft1).start();
+                                                            Toast.makeText(getApplicationContext(),
+                                                                    "退出成功", Toast.LENGTH_SHORT)
+                                                                    .show();
+                                                            AllZuActivity.this.finish();*/
+
+                                                        }
+                                                    });
+
+                                        }else{
+                                            final AlertDialog dialog = new AlertDialog.Builder(
+                                                    AllZuActivity.this).create();
+                                            dialog.show();
+                                            dialog.getWindow()
+                                                    .clearFlags(
+                                                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                                                                    | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                                            Window window = dialog.getWindow();
+                                            window.setContentView(R.layout.ask_delete);
+                                            TextView askdelete = (TextView) window
+                                                    .findViewById(R.id.ask_delete);
+                                            askdelete.setText("你确定退群吗？");
+                                            TextView askconfirm = (TextView) window
+                                                    .findViewById(R.id.ask_confirm);
+                                            askconfirm
+                                                    .setOnClickListener(new View.OnClickListener() {
+
+                                                        @Override
+                                                        public void onClick(View arg0) {
+                                                            // TODO Auto-generated method stub
+                                                            Retrofitutil.getmRetrofit()
+                                                                    .create(ExitFromGroupAndSGroupAPI.class)
+                                                                    .exitFromGroupAndSGroup(group.getGID(),myApplication.getCustomers().getcID())
+                                                                    .subscribeOn(Schedulers.io())
+                                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                                    .subscribe(new Consumer<NumberResult>() {
+                                                                        @Override
+                                                                        public void accept(@NonNull NumberResult numberResult) throws Exception {
+                                                                            if (numberResult.getResult().equals("6")) {
+                                                                                Toast.makeText(
+                                                                                        getApplicationContext(),
+                                                                                        "退出群成功！",
+                                                                                        Toast.LENGTH_SHORT)
+                                                                                        .show();
+                                                                                AllZuActivity.this.finish();
+                                                                            } else if (numberResult.getResult().equals("0")) {
+                                                                                Toast.makeText(AllZuActivity.this,
+                                                                                        "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        }
+                                                                    }, new Consumer<Throwable>() {
+                                                                        @Override
+                                                                        public void accept(@NonNull Throwable throwable) throws Exception {
+                                                                            Toast.makeText(AllZuActivity.this,
+                                                                                    throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+
+                                                            /*Database.ExitFromGroup exitfromgroup = new Database.ExitFromGroup(
+                                                                    Currents.currentGroup.getgID(),
+                                                                    Currents.currentCustomer
+                                                                            .getcID());
+                                                            FutureTask<Boolean> ft1 = new FutureTask<Boolean>(
+                                                                    exitfromgroup);
+                                                            new Thread(ft1).start();
+                                                            Toast.makeText(getApplicationContext(),
+                                                                    "退出成功", Toast.LENGTH_SHORT)
+                                                                    .show();
+                                                            AllZuActivity.this.finish();*/
+
+                                                        }
+                                                    });
+
+
+                                        }
+                                    }
+                                }, new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(@NonNull Throwable throwable) throws Exception {
+                                        Toast.makeText(AllZuActivity.this,
+                                                throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                       /* final AlertDialog dialog = new AlertDialog.Builder(
                                 AllZuActivity.this).create();
                         dialog.show();
                         dialog.getWindow()
@@ -552,13 +727,13 @@ public class AllZuActivity extends Activity {
                                         AllZuActivity.this.finish();
 
                                     }
-                                });
+                                });*/
 
                     }
-                } else {
+/*                } else {
                     Toast.makeText(getApplicationContext(), "当前群被锁定无法操作。",
                             Toast.LENGTH_SHORT).show();
-                }
+                }*/
 
             }
         });
@@ -578,23 +753,23 @@ public class AllZuActivity extends Activity {
                 window.setContentView(R.layout.group_messg);
                 EditText idt = (EditText) window
                         .findViewById(R.id.groupid_edit);
-                idt.setText(Currents.currentGroup.getgID());
+                idt.setText(group.getGID());
                 idt.setEnabled(false);
                 EditText nmt = (EditText) window
                         .findViewById(R.id.groupname_edit);
-                nmt.setText(Currents.currentGroup.getgName());
+                nmt.setText(group.getGName());
                 nmt.setEnabled(false);
                 EditText pdt = (EditText) window
                         .findViewById(R.id.grouppwd_edit);
-                pdt.setText(Currents.currentGroup.getgPasswd());
+                pdt.setText(group.getGPasswd());
                 pdt.setEnabled(false);
                 EditText mint = (EditText) window
                         .findViewById(R.id.grouplimit_min);
-                mint.setText("" + Currents.currentGroup.getgMin());
+                mint.setText("" + group.getGMin());
                 mint.setEnabled(false);
                 EditText maxt = (EditText) window
                         .findViewById(R.id.grouplimit_max);
-                maxt.setText("" + Currents.currentGroup.getgMax());
+                maxt.setText("" + group.getGMax());
                 maxt.setEnabled(false);
 
             }

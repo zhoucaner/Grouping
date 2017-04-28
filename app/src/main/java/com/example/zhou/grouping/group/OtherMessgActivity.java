@@ -9,6 +9,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.zhou.grouping.R;
+import com.example.zhou.grouping.application.MyApplication;
 import com.example.zhou.grouping.dao.Database.LoadPersonalInfo;
 
 import java.util.List;
@@ -17,11 +18,15 @@ import java.util.concurrent.FutureTask;
 public class OtherMessgActivity extends Activity {
 
 	private ImageButton permessgbackbtn;// 返回按钮
+	private MyApplication myApplication;
+
 
 	private TextView otheridtext;
-	private TextView othersextext;
 	private TextView othernametext;
+	private TextView othersextext;
 	private TextView otherclasstext;
+	private TextView otheremailtext;
+	private TextView otherinfotext;
 
 	private Spinner spinner;
 	private List<String> data_list;
@@ -43,11 +48,14 @@ public class OtherMessgActivity extends Activity {
 
 			}
 		});
-
+		myApplication = (MyApplication) getApplication();
 		otheridtext = (TextView) findViewById(R.id.other_cid);
 		othernametext = (TextView) findViewById(R.id.other_cname);
 		otherclasstext = (TextView) findViewById(R.id.other_cclass);
 		othersextext = (TextView) findViewById(R.id.other_sex);
+		otheremailtext = (TextView) findViewById(R.id.other_email_edit);
+		otherinfotext = (TextView) findViewById(R.id.other_introduction);
+
 
 		// 获取当前要查看的人的信息，接口
 		LoadPersonalInfo loadpersonalinfo = new LoadPersonalInfo(
@@ -62,8 +70,8 @@ public class OtherMessgActivity extends Activity {
 			e.printStackTrace();
 		}
 
-		otheridtext.setText(Currents.currentOtherCustomer.getcID());
-		othernametext.setText(Currents.currentOtherCustomer.getcName());
+		otheridtext.setText(myApplication.getCustomers().getcID());
+		othernametext.setText(myApplication.getCustomers().getcName());
 		otherclasstext.setText("" + Currents.currentOtherCustomer.getcClass());
 		int s = Currents.currentOtherCustomer.getcSex();
 		if (s == 1) {

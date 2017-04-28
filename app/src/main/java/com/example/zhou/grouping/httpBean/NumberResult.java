@@ -4,7 +4,7 @@ package com.example.zhou.grouping.httpBean;
  * Created by Zhou on 2017/4/25.
  */
 
-public class DeleteSGroupResult {
+public class NumberResult {
 
     /**
      * result : 0

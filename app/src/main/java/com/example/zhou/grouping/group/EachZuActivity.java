@@ -20,7 +20,7 @@ import com.example.zhou.grouping.api.JoinInSGroupAPI;
 import com.example.zhou.grouping.api.LoadSGroupMembersAPI;
 import com.example.zhou.grouping.api.SelectSgIDAndIfOpenAPI;
 import com.example.zhou.grouping.application.MyApplication;
-import com.example.zhou.grouping.httpBean.DeleteSGroupResult;
+import com.example.zhou.grouping.httpBean.NumberResult;
 import com.example.zhou.grouping.httpBean.ExitFromSGroupResult;
 import com.example.zhou.grouping.httpBean.JoinInSGroupResult;
 import com.example.zhou.grouping.httpBean.LoadSGroupMembers;
@@ -282,17 +282,17 @@ public class EachZuActivity extends Activity {
                             .deleteSGroup(gID,sgID)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Consumer<DeleteSGroupResult>() {
+                            .subscribe(new Consumer<NumberResult>() {
                                 @Override
-                                public void accept(@NonNull DeleteSGroupResult deleteSGroupResult) throws Exception {
-                                    if (deleteSGroupResult.getResult().equals("6")) {
+                                public void accept(@NonNull NumberResult numberResult) throws Exception {
+                                    if (numberResult.getResult().equals("6")) {
                                         Toast.makeText(
                                                 getApplicationContext(),
                                                 "解散成功",
                                                 Toast.LENGTH_SHORT)
                                                 .show();
                                         EachZuActivity.this.finish();
-                                    } else if (deleteSGroupResult.getResult().equals("0")) {
+                                    } else if (numberResult.getResult().equals("0")) {
                                         Toast.makeText(EachZuActivity.this,
                                                 "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
                                     }

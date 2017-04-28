@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.zhou.grouping.R;
+import com.example.zhou.grouping.application.MyApplication;
 import com.example.zhou.grouping.dao.Database.UpdateName;
 import com.example.zhou.grouping.dao.Database.UpdatePassword;
 import com.example.zhou.grouping.dao.Database.UpdatecClass;
@@ -49,6 +50,8 @@ public class PersonalMessgActivity extends Activity {
 	private Spinner spinner;
 	private List<String> data_list;
 	private ArrayAdapter<String> arr_adapter;
+	private MyApplication myApplication;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +87,11 @@ public class PersonalMessgActivity extends Activity {
 
 		peruserbtn = (TextView) findViewById(R.id.per_userid_edit);
 		peruserbtn.setText(Currents.currentCustomer.getcID());
+		myApplication = (MyApplication) getApplication();
 
 		// 修改用户名
 		modifyusernametext = (TextView) findViewById(R.id.per_username_edit);
-		modifyusernametext.setText(Currents.currentCustomer.getcName());
+		modifyusernametext.setText(myApplication.getCustomers().getcID());
 		modifyusernametext.setOnClickListener(new View.OnClickListener() {
 
 			@Override
