@@ -10,7 +10,7 @@ import retrofit2.http.Query;
  * Created by Zhou on 2017/4/15.
  */
 
-public interface IfOwnerOfGroup {
+public interface IfOwnerOfGroupAPI {
     @GET("selectIfOwnerOFGroup.php")
     Observable<Result> isOwner(@Query("gID") String gid, @Query("cID") String cID);
 }

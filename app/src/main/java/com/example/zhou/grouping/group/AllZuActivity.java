@@ -12,7 +12,6 @@ import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -26,23 +25,30 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.zhou.grouping.R;
-import com.example.zhou.grouping.api.IfOwnerOfGroup;
+import com.example.zhou.grouping.api.CreateNewSGroupAPI;
+import com.example.zhou.grouping.api.IfOwnerOfGroupAPI;
+import com.example.zhou.grouping.api.LoadGroupMembersAPI;
+import com.example.zhou.grouping.api.LoadSGroupAPI;
 import com.example.zhou.grouping.application.MyApplication;
-import com.example.zhou.grouping.dao.Database;
 import com.example.zhou.grouping.dao.Database.CreateNewSGroup;
 import com.example.zhou.grouping.dao.Database.ExitFromGroup;
 import com.example.zhou.grouping.dao.Database.JoinInSGroup;
-import com.example.zhou.grouping.dao.Database.LoadGroupMembers;
 import com.example.zhou.grouping.dao.Database.SelectIfOpen;
 import com.example.zhou.grouping.dao.Database.SelectMaxSGroupID;
 import com.example.zhou.grouping.dao.Database.SelectNotInSGroup;
 import com.example.zhou.grouping.dao.Database.UpdateIfOpen;
 import com.example.zhou.grouping.dao.Database.deleteGroup;
+import com.example.zhou.grouping.httpBean.CreateNewSGroupResult;
+import com.example.zhou.grouping.httpBean.GroupMembers;
 import com.example.zhou.grouping.httpBean.LoadGroups;
+import com.example.zhou.grouping.httpBean.LoadSGroup;
 import com.example.zhou.grouping.httpBean.Result;
 import com.example.zhou.grouping.retrofitUtil.Retrofitutil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
@@ -72,14 +78,17 @@ public class AllZuActivity extends Activity {
 
     private boolean TBGroupState;
 
-    private ListView zulistview;
-    private ListView memberlistview;
-    public static ArrayList<String> zulist = new ArrayList<String>();
-    public static ArrayList<String> listsgnumber = new ArrayList<String>();
-    public static ArrayList<String> memberlist = new ArrayList<String>();
+    private ListView listView;
+//    public ArrayList<String> zulist = new ArrayList<>();//组列表
+    public ArrayList<String> listsgnumber = new ArrayList<>();//组编号
+
+    public ArrayList<String> viewList = new ArrayList<>();
+    public ArrayList<String> memberIdlist = new ArrayList<>();//群成员Id
 
     private MyApplication myApplication;
     private boolean isOwner;
+    private LoadGroups group;
+    private ArrayAdapter<String> myArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +96,37 @@ public class AllZuActivity extends Activity {
         setContentView(R.layout.all_zu);
         myApplication = (MyApplication) getApplication();
 
-        LoadGroups group = (LoadGroups) getIntent().getExtras().get("group");
+        group = (LoadGroups) getIntent().getExtras().get("group");
 
         GroupNameText = (TextView) findViewById(R.id.allzuming);
         GroupNameText.setText(group.getGName());
+        listView = (ListView) findViewById(R.id.listview_allzu);
+        myArrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, viewList);
+        listView.setAdapter(myArrayAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0,
+                                    View arg1, int arg2, long arg3) {
+                if (viewList.get(0).startsWith("G")){
+
+                    Intent t = new Intent(AllZuActivity.this,
+                            EachZuActivity.class);
+                    t.putExtra("sgID",listsgnumber.get(arg2));
+                    t.putExtra("gID",group.getGID());
+                    startActivity(t);
+                }else{
+                    Intent t = new Intent(AllZuActivity.this,
+                            OtherMessgActivity.class);
+                    startActivity(t);
+                }
+
+            }
+        });
 
         Retrofitutil.getmRetrofit()
-                .create(IfOwnerOfGroup.class)
+                .create(IfOwnerOfGroupAPI.class)
                 .isOwner(group.getGID(), myApplication.getCustomers().getcID())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -116,22 +149,8 @@ public class AllZuActivity extends Activity {
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                setGroupAdapter();
-                zulistview.setOnItemClickListener(new OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(AdapterView<?> arg0, View arg1,
-                                            int arg2, long arg3) {
-                        // TODO Auto-generated method stub
-                        Currents.currentSGroup.setSgID(Integer
-                                .parseInt(AllZuActivity.listsgnumber.get(arg2)));
-                        Currents.currentSGroup.setgID(Currents.currentGroup
-                                .getgID());
-                        Intent t = new Intent(AllZuActivity.this,
-                                EachZuActivity.class);
-                        startActivity(t);
-                    }
-                });
+                loadSGroup();
+                //setGroupAdapter();
             }
         });
         qunfenzu.performClick();
@@ -139,29 +158,10 @@ public class AllZuActivity extends Activity {
         // 群成员按钮功能
         qunchengyuan = (TextView) findViewById(R.id.qunchengyuan);
         qunchengyuan.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                setMembersAdapter();
-                memberlistview
-                        .setOnItemClickListener(new OnItemClickListener() {
-
-                            @Override
-                            public void onItemClick(AdapterView<?> arg0,
-                                                    View arg1, int arg2, long arg3) {
-                                // TODO Auto-generated method stub
-                                Currents.currentOtherCustomer
-                                        .setcID(Currents.gCustomersList.get(
-                                                arg2).getcID());
-
-                                Intent t = new Intent(AllZuActivity.this,
-                                        OtherMessgActivity.class);
-                                startActivity(t);
-
-                            }
-                        });
-
+                loadMembers();
             }
         });
 
@@ -195,87 +195,108 @@ public class AllZuActivity extends Activity {
                     default:
                         break;
                 }
-
             }
         });
 
     }
 
     // 刷新群组列表
-    protected void setGroupAdapter() {
-        Currents.SGroupsList.clear();
-        AllZuActivity.zulist.clear();
-        AllZuActivity.listsgnumber.clear();
-        Database.loadSGroups loadsgroups = new Database.loadSGroups(
-                Currents.currentGroup.getgID());
-        FutureTask<Boolean> ft = new FutureTask<Boolean>(loadsgroups);
-        Thread th = new Thread(ft);
-        th.start();
-        try {
-            th.join();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        int sgid, oldSGroupID = -1;
-        String sgname;
-        for (int i = 0; i < Currents.SGroupsList.size(); i++) {
-            sgid = Currents.SGroupsList.get(i).getSgID();
-            sgname = Currents.SGroupsList.get(i).getcName();
-            if (sgid != oldSGroupID) {
-                AllZuActivity.zulist.add("G"
-                        + Currents.SGroupsList.get(i).getSgID() + " " + sgname);
-                AllZuActivity.listsgnumber.add(""
-                        + Currents.SGroupsList.get(i).getSgID());
-            } else {
-                AllZuActivity.zulist
-                        .set(AllZuActivity.zulist.size() - 1,
-                                AllZuActivity.zulist.get(AllZuActivity.zulist
-                                        .size() - 1) + " " + sgname);
-            }
-            oldSGroupID = sgid;
-        }
-        this.zulistview = (ListView) findViewById(R.id.listview_allzu);
-        ArrayAdapter<String> myArrayAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, zulist);
-        this.zulistview.setAdapter(myArrayAdapter);
-    }
-
-    // 刷新群成员列表
-    protected void setMembersAdapter() {
-        AllZuActivity.memberlist.clear();
-        Currents.gCustomersList.clear();
-        LoadGroupMembers loadgroupmembers = new LoadGroupMembers(
-                Currents.currentGroup.getgID());
-        FutureTask<Boolean> ft = new FutureTask<Boolean>(loadgroupmembers);
-        Thread th = new Thread(ft);
-        th.start();
-        try {
-            th.join();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String cname;
-        for (int i = 0; i < Currents.gCustomersList.size(); i++) {
-            cname = Currents.gCustomersList.get(i).getcName();
-            if (i == 0) {
-                AllZuActivity.memberlist.add("群主： " + cname);
-            } else {
-                AllZuActivity.memberlist.add(i + "： " + cname);
-            }
-        }
-        this.memberlistview = (ListView) findViewById(R.id.listview_allzu);
-        ArrayAdapter<String> myArrayAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, memberlist);
-        this.memberlistview.setAdapter(myArrayAdapter);
-
-    }
+//    protected void setGroupAdapter() {
+//        Currents.SGroupsList.clear();
+//        zulist.clear();
+//        listsgnumber.clear();
+//        Database.loadSGroups loadsgroups = new Database.loadSGroups(
+//                Currents.currentGroup.getgID());
+//        FutureTask<Boolean> ft = new FutureTask<Boolean>(loadsgroups);
+//        Thread th = new Thread(ft);
+//        th.start();
+//        try {
+//            th.join();
+//        } catch (InterruptedException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        int sgid, oldSGroupID = -1;
+//        String sgname;
+//        for (int i = 0; i < Currents.SGroupsList.size(); i++) {
+//            sgid = Currents.SGroupsList.get(i).getSgID();
+//            sgname = Currents.SGroupsList.get(i).getcName();
+//            if (sgid != oldSGroupID) {
+//                zulist.add("G"
+//                        + Currents.SGroupsList.get(i).getSgID() + " " + sgname);
+//                listsgnumber.add(""
+//                        + Currents.SGroupsList.get(i).getSgID());
+//            } else {
+//                zulist
+//                        .set(zulist.size() - 1,
+//                                zulist.get(zulist
+//                                        .size() - 1) + " " + sgname);
+//            }
+//            oldSGroupID = sgid;
+//        }
+//
+//    }
 
     @Override
     protected void onResume() {
-        this.setGroupAdapter();
+//        this.setGroupAdapter();
         super.onResume();
+        loadSGroup();
+
+    }
+    // 刷新群成员列表
+    protected void loadMembers() {
+        Retrofitutil.getmRetrofit()
+                .create(LoadGroupMembersAPI.class)
+                .loadGroupMembers(group.getGID())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<GroupMembers>>() {
+                    @Override
+                    public void accept(@NonNull List<GroupMembers> groupMemberses) throws Exception {
+                        viewList.clear();
+                        memberIdlist.clear();
+                        for (GroupMembers groupMemberse : groupMemberses) {
+                            viewList.add(groupMemberse.getCName());
+                            memberIdlist.add(groupMemberse.getCID());
+                        }
+                        String owner = viewList.get(0);
+                        viewList.set(0,"群主： "+owner);
+                        myArrayAdapter.notifyDataSetChanged();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        Toast.makeText(AllZuActivity.this,throwable.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+
+    // 刷新小组列表
+    protected void loadSGroup() {
+        Retrofitutil.getmRetrofit()
+                .create(LoadSGroupAPI.class)
+                .loadSGroup(group.getGID())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<LoadSGroup>>() {
+                    @Override
+                    public void accept(@NonNull List<LoadSGroup> loadSGroups) throws Exception {
+                        viewList.clear();
+                        listsgnumber.clear();
+                        for (LoadSGroup group : loadSGroups) {
+                            viewList.add("G"+group.getSgID()+"  "+group.getCName());
+                            listsgnumber.add(group.getSgID());
+                        }
+                        myArrayAdapter.notifyDataSetChanged();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        Toast.makeText(AllZuActivity.this,throwable.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     public void initmPopupWindowView() {
@@ -311,10 +332,53 @@ public class AllZuActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                // 判断当前群状态
+                Map<String, String> options = new HashMap<>();
+                options.put("gID", group.getGID());
+                options.put("cID", myApplication.getCustomers().getcID());
+                options.put("ifsgOwner", "1");
+                Retrofitutil.getmRetrofit()
+                        .create(CreateNewSGroupAPI.class)
+                        .createNewSGroup(options)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<CreateNewSGroupResult>() {
+                            @Override
+                            public void accept(@NonNull CreateNewSGroupResult createNewSGroupResult) throws Exception {
+                                if (createNewSGroupResult.getResult().equals("6")) {
+                                    Toast.makeText(
+                                            getApplicationContext(),
+                                            "新建成功！",
+                                            Toast.LENGTH_SHORT)
+                                            .show();
+                                    loadSGroup();
+                                } else if (createNewSGroupResult.getResult().equals("0")) {
+                                    Toast.makeText(AllZuActivity.this,
+                                            "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
+                                }else if (createNewSGroupResult.getResult().equals("1")) {
+                                    Toast.makeText(AllZuActivity.this,
+                                            "你已在群内小组中，无法新建小组。", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(@NonNull Throwable throwable) throws Exception {
+                                Toast.makeText(AllZuActivity.this,
+                                        throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+/*
+
+
+
+
+
+
+
+
                 SelectIfOpen selectifopen = new SelectIfOpen(
                         Currents.currentSGroup.getgID());
-                FutureTask<Boolean> ft1 = new FutureTask<Boolean>(selectifopen);
+                FutureTask<Boolean> ft1 = new FutureTask<>(selectifopen);
                 Thread th1 = new Thread(ft1);
                 th1.start();
                 try {
@@ -367,7 +431,7 @@ public class AllZuActivity extends Activity {
                                     }
                                     if (ifcreate == true) {
                                         dialog.dismiss();
-                                        setGroupAdapter();
+//                                        setGroupAdapter();
                                         Toast.makeText(getApplicationContext(),
                                                 "创建成功", Toast.LENGTH_SHORT)
                                                 .show();
@@ -382,7 +446,7 @@ public class AllZuActivity extends Activity {
                 } else {
                     Toast.makeText(getApplicationContext(), "当前群被锁定无法操作。",
                             Toast.LENGTH_SHORT).show();
-                }
+                }*/
 
             }
         });
@@ -710,7 +774,7 @@ public class AllZuActivity extends Activity {
                                             }
 
                                             // 更新列表
-                                            setGroupAdapter();
+//                                            setGroupAdapter();
                                         } else {
                                         }
 

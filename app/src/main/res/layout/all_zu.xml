@@ -11,7 +11,7 @@
         android:layout_height="48dp"
         android:layout_alignParentTop="true"
         android:background="@drawable/title"
-        android:focusable="true"
+        android:focusable="false"
         android:focusableInTouchMode="true" >
 
         <ImageButton
@@ -45,6 +45,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="15dp"
+            android:focusable="false"
             android:background="@android:color/transparent"
             android:src="@drawable/more_logo2" />
     </RelativeLayout>
