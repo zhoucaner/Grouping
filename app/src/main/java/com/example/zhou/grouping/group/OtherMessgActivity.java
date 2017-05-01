@@ -7,13 +7,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.zhou.grouping.R;
+import com.example.zhou.grouping.api.LoadPersonalInfoAPI;
 import com.example.zhou.grouping.application.MyApplication;
 import com.example.zhou.grouping.dao.Database.LoadPersonalInfo;
+import com.example.zhou.grouping.httpBean.LoadPersonalInfoResult;
+import com.example.zhou.grouping.retrofitUtil.Retrofitutil;
 
 import java.util.List;
 import java.util.concurrent.FutureTask;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class OtherMessgActivity extends Activity {
 
@@ -31,6 +40,7 @@ public class OtherMessgActivity extends Activity {
 	private Spinner spinner;
 	private List<String> data_list;
 	private ArrayAdapter<String> arr_adapter;
+	private String cID;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +60,12 @@ public class OtherMessgActivity extends Activity {
 		});
 		myApplication = (MyApplication) getApplication();
 		otheridtext = (TextView) findViewById(R.id.other_cid);
-		othernametext = (TextView) findViewById(R.id.other_cname);
+		othernametext = (TextView) findViewById(R.id.other_cName);
 		otherclasstext = (TextView) findViewById(R.id.other_cclass);
 		othersextext = (TextView) findViewById(R.id.other_sex);
 		otheremailtext = (TextView) findViewById(R.id.other_email_edit);
 		otherinfotext = (TextView) findViewById(R.id.other_introduction);
+		cID = getIntent().getStringExtra("cID");
 
 
 		// 获取当前要查看的人的信息，接口
@@ -69,17 +80,34 @@ public class OtherMessgActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Retrofitutil.getmRetrofit()
+				.create(LoadPersonalInfoAPI.class)
+				.loadPersonalInfo(cID)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Consumer<LoadPersonalInfoResult>() {
+					@Override
+					public void accept(@NonNull LoadPersonalInfoResult loadPersonalInfoResult) throws Exception {
+						otheridtext.setText(cID);
+						othernametext.setText(loadPersonalInfoResult.getCName());
+						if (loadPersonalInfoResult.getCSex().equals("1")) {
+							othersextext.setText("男");
+						} else {
+							othersextext.setText("女");
+						}
+						otherclasstext.setText(loadPersonalInfoResult.getCClass());
+						otheremailtext.setText(loadPersonalInfoResult.getEmail());
+						otherinfotext.setText(loadPersonalInfoResult.getCInfo());
 
-		otheridtext.setText(myApplication.getCustomers().getcID());
-		othernametext.setText(myApplication.getCustomers().getcName());
-		otherclasstext.setText("" + Currents.currentOtherCustomer.getcClass());
-		int s = Currents.currentOtherCustomer.getcSex();
-		if (s == 1) {
-			othersextext.setText("男");
-		} else {
-			othersextext.setText("女");
-		}
+					}
+				}, new Consumer<Throwable>() {
+					@Override
+					public void accept(@NonNull Throwable throwable) throws Exception {
+						Toast.makeText(OtherMessgActivity.this,throwable.getMessage(),Toast.LENGTH_LONG).show();
 
+
+					}
+				});
 	}
 
 }

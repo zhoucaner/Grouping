@@ -122,6 +122,7 @@ public class AllZuActivity extends Activity {
                 }else{
                     Intent t = new Intent(AllZuActivity.this,
                             OtherMessgActivity.class);
+                    t.putExtra("cID",memberIdlist.get(arg2));
                     startActivity(t);
                 }
 

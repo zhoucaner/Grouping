@@ -7,7 +7,16 @@ public class Customers {
 	private String cPasswd;
 	private String cClass;
 	private String cMail;
+	private String info;
 	private int cSex;
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
+	}
 
 	public String getcID() {
 		return cID;
