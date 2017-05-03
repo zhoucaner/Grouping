@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class Retrofitutil {
-    public static final String API_BASE_URL = "http://192.168.1.2/";
+    public static final String API_BASE_URL = "http://192.168.1.3/";
 
     private static Retrofit mRetrofit = new Retrofit.Builder().
             baseUrl(API_BASE_URL)

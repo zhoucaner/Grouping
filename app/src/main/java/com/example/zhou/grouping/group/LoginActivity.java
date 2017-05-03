@@ -126,6 +126,9 @@ public class LoginActivity extends Activity {
                                             customers.setcID(cIDStr);
                                             customers.setcName(userBean.getCName());
                                             customers.setcPasswd(pwdStr);
+                                            customers.setcClass(userBean.getCClass());
+                                            customers.setcMail(userBean.getEmail());
+                                            customers.setInfo(userBean.getcInfo());
                                             myApplication.setCustomers(customers);
                                             Toast.makeText(LoginActivity.this, "登录成功，加载中...",
                                                     Toast.LENGTH_SHORT).show();

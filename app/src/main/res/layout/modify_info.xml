@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="270dp"
+    android:layout_height="150.0dip"
+    android:background="@drawable/white"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/modify_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="10dp"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:text="修改个人简介"
+        android:textColor="#cc4a4f70"
+        android:textSize="20.0sp" />
+
+    <View
+        android:layout_width="300dp"
+        android:layout_height="0.5dip"
+        android:background="@drawable/title"
+        android:layout_gravity="center"
+        android:layout_below="@id/modify_info"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/new_info_edit"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/modify_info"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/edit_back"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingLeft="13dp"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/new_info_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="14dp"
+        android:layout_marginRight="14dp"
+        android:text="确认修改"
+        android:textColor="@drawable/grey"
+        android:textSize="17sp" />
+
+</RelativeLayout>
+

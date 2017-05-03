@@ -17,6 +17,25 @@ public class UserBean {
     private String cName;
     private String cSex;
     private String cClass;
+    private String email;
+    private String cInfo;
+
+    public String getcInfo() {
+        return cInfo;
+    }
+
+    public void setcInfo(String cInfo) {
+        this.cInfo = cInfo;
+    }
+
+    public String getEmail() {
+
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getCPasswd() {
         return cPasswd;

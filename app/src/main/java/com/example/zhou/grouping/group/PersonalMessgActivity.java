@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -16,16 +15,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.zhou.grouping.R;
+import com.example.zhou.grouping.api.UpdatePersonalMsgAPI;
 import com.example.zhou.grouping.application.MyApplication;
-import com.example.zhou.grouping.dao.Database.UpdateName;
 import com.example.zhou.grouping.dao.Database.UpdatePassword;
-import com.example.zhou.grouping.dao.Database.UpdatecClass;
-import com.example.zhou.grouping.dao.Database.UpdatecSex;
+import com.example.zhou.grouping.httpBean.Result;
+import com.example.zhou.grouping.retrofitUtil.Retrofitutil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class PersonalMessgActivity extends Activity {
 
@@ -38,14 +44,24 @@ public class PersonalMessgActivity extends Activity {
 	private TextView modifyusernameconfirm;
 	private TextView modifyclasstext;
 	private TextView modifyclassconfirm;
+	private TextView modifyemailconfirm;
+	private TextView modifyinfoconfirm;
 	private EditText yuanpwdedt;
 	private EditText newpwdedt1;
 	private EditText newpwdedt2;
+    private TextView modifyidtext;
+    private TextView modifyemailtext;
+    private TextView modifyinfotext;
+    private Button edit;// 加入按钮
 
-	private String yuanpwdstr;
+
+
+
+    private String yuanpwdstr;
 	private String newpwdstr1;
 	private String newpwdstr2;
 	private int csex;
+	private boolean editFlag = false;
 
 	private Spinner spinner;
 	private List<String> data_list;
@@ -58,18 +74,25 @@ public class PersonalMessgActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.personal_messg);
 
-		spinner = (Spinner) findViewById(R.id.spinner);
-		// 数据
+		spinner = (Spinner) findViewById(R.id.spinner);//性别下拉列表
+        modifyidtext = (TextView) findViewById(R.id.per_userid_edit);//用户ID
+        modifyusernametext = (TextView) findViewById(R.id.per_username_edit);//用户名
+        modifyclasstext = (TextView) findViewById(R.id.per_class_edit);//行政班
+        modifyemailtext = (TextView) findViewById(R.id.per_email_edit);//邮箱
+        modifyinfotext = (TextView) findViewById(R.id.other_introduction);//个人简介
+        edit = (Button) findViewById(R.id.editing);//编辑button
+
+
+
+        // 数据
 		data_list = new ArrayList<String>();
 		data_list.add("女");
 		data_list.add("男");
 
 		// 适配器
-		arr_adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, data_list);
+		arr_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, data_list);
 		// 设置样式
-		arr_adapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// 加载适配器
 		spinner.setAdapter(arr_adapter);
 
@@ -89,9 +112,120 @@ public class PersonalMessgActivity extends Activity {
 		peruserbtn.setText(Currents.currentCustomer.getcID());
 		myApplication = (MyApplication) getApplication();
 
+
+
+        //load个人信息
+        modifyidtext.setText(myApplication.getCustomers().getcID());
+        modifyusernametext.setText(myApplication.getCustomers().getcName());
+        int position = 0;
+        if(myApplication.getCustomers().getcSex() ==1)
+            position = 1;
+        spinner.setSelection(position);
+        modifyclasstext.setText(myApplication.getCustomers().getcClass());
+        modifyemailtext.setText(myApplication.getCustomers().getcMail());
+        modifyinfotext.setText(myApplication.getCustomers().getInfo());
+
+
+        // 编辑个人信息
+        edit.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+				if(!editFlag) {
+					modifyusernametext.setEnabled(true);
+					spinner.setEnabled(true);
+					modifyclasstext.setEnabled(true);
+					modifyemailtext.setEnabled(true);
+					modifyinfotext.setEnabled(true);
+					edit.setText("保存");
+					editFlag = true;
+				}
+				else{
+					Map<String, String> options = new HashMap<>();
+					options.put("cID", myApplication.getCustomers().getcID());
+					options.put("cName", modifyusernametext.getText().toString());
+					if(spinner.getSelectedItem().toString().equals("女"))
+						options.put("cSex", "0");
+					else
+						options.put("cSex", "1");
+					options.put("cClass", modifyclasstext.getText().toString());
+					options.put("cInfo", modifyinfotext.getText().toString());
+					options.put("email", modifyemailtext.getText().toString());
+					Retrofitutil.getmRetrofit()
+							.create(UpdatePersonalMsgAPI.class)
+							.updatePersonalMsg(options)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe(new Consumer<Result>() {
+								@Override
+								public void accept(@NonNull Result result) throws Exception {
+										modifyusernametext.setEnabled(false);
+										spinner.setEnabled(false);
+										modifyclasstext.setEnabled(false);
+										modifyemailtext.setEnabled(false);
+										modifyinfotext.setEnabled(false);
+										edit.setText("编辑");
+										editFlag = false;
+									Toast.makeText(
+											getApplicationContext(),
+											"修改成功",
+											Toast.LENGTH_SHORT)
+											.show();
+								}
+							}, new Consumer<Throwable>() {
+								@Override
+								public void accept(@NonNull Throwable throwable) throws Exception {
+									Toast.makeText(PersonalMessgActivity.this,
+											throwable.getMessage(), Toast.LENGTH_SHORT).show();
+								}
+							});
+
+
+				}
+              /*  Map<String, String> options = new HashMap<>();
+                options.put("gID", gID);
+                options.put("cID", myApplication.getCustomers().getcID());
+                options.put("sgID", sgID);
+                options.put("ifsgOwner", "0");
+                Retrofitutil.getmRetrofit()
+                        .create(JoinInSGroupAPI.class)
+                        .joinInSGroup(options)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<JoinInSGroupResult>() {
+                            @Override
+                            public void accept(@NonNull JoinInSGroupResult joinInSGroupResult) throws Exception {
+                                if (joinInSGroupResult.getResult().equals("6")) {
+                                    Toast.makeText(
+                                            getApplicationContext(),
+                                            "加入成功",
+                                            Toast.LENGTH_SHORT)
+                                            .show();
+                                    join.setVisibility(View.INVISIBLE);
+                                    quit.setVisibility(View.VISIBLE);
+                                    setAdapter();
+//																	dialog1.dismiss();
+                                } else if (joinInSGroupResult.getResult().equals("0")) {
+                                    Toast.makeText(EachZuActivity.this,
+                                            "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
+                                } else if (joinInSGroupResult.getResult().equals("1")) {
+                                    Toast.makeText(EachZuActivity.this,
+                                            "该组人数已达上限。", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(@NonNull Throwable throwable) throws Exception {
+                                Toast.makeText(EachZuActivity.this,
+                                        throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }*/
+                        }}
+            );
+
+
 		// 修改用户名
-		modifyusernametext = (TextView) findViewById(R.id.per_username_edit);
-		modifyusernametext.setText(myApplication.getCustomers().getcID());
+	//	modifyusernametext.setText(myApplication.getCustomers().getcID());
 		modifyusernametext.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -121,39 +255,8 @@ public class PersonalMessgActivity extends Activity {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								String newnamestr = dialogText.getText()
-										.toString();
-								boolean ifsuccess = false;
-								UpdateName updatename = new UpdateName(
-										Currents.currentCustomer.getcID(),
-										newnamestr);
-								FutureTask<Boolean> ft = new FutureTask<Boolean>(
-										updatename);
-								Thread th = new Thread(ft);
-								th.start();
-
-								try {
-									th.join();
-									ifsuccess = ft.get();
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (ExecutionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								if (ifsuccess == true) {
-									dialog.dismiss();
-									Toast.makeText(getApplicationContext(),
-											"修改成功", Toast.LENGTH_SHORT).show();
-									modifyusernametext.setText(newnamestr);
-									Currents.currentCustomer
-											.setcName(newnamestr);
-								} else {
-									dialog.dismiss();
-									Toast.makeText(getApplicationContext(),
-											"修改失败", Toast.LENGTH_SHORT).show();
-								}
+                                modifyusernametext.setText(dialogText.getText());
+                                dialog.dismiss();
 							}
 						});
 
@@ -161,8 +264,7 @@ public class PersonalMessgActivity extends Activity {
 		});
 
 		// 修改行政班
-		modifyclasstext = (TextView) findViewById(R.id.per_class_edit);
-		modifyclasstext.setText(Currents.currentCustomer.getcClass());
+	//	modifyclasstext.setText(Currents.currentCustomer.getcClass());
 		modifyclasstext.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -178,7 +280,7 @@ public class PersonalMessgActivity extends Activity {
 				Window window = dialog.getWindow();
 				window.setContentView(R.layout.modify_class);
 
-				// 在dialog上显示原用户名
+
 				String str = modifyclasstext.getText().toString();
 				final EditText dialogText = (EditText) window
 						.findViewById(R.id.new_class_edit);
@@ -192,86 +294,99 @@ public class PersonalMessgActivity extends Activity {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								String newclassstr = dialogText.getText()
-										.toString();
-								boolean ifsuccess = false;
-								UpdatecClass updatecclass = new UpdatecClass(
-										Currents.currentCustomer.getcID(),
-										newclassstr);
-								FutureTask<Boolean> ft = new FutureTask<Boolean>(
-										updatecclass);
-								Thread th = new Thread(ft);
-								th.start();
-								try {
-									th.join();
-									ifsuccess = ft.get();
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (ExecutionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								if (ifsuccess == true) {
-									dialog.dismiss();
-									Toast.makeText(getApplicationContext(),
-											"修改成功", Toast.LENGTH_SHORT).show();
-									modifyclasstext.setText(newclassstr);
-									Currents.currentCustomer
-											.setcClass(newclassstr);
-								} else {
-									dialog.dismiss();
-									Toast.makeText(getApplicationContext(),
-											"修改失败", Toast.LENGTH_SHORT).show();
-								}
+                                modifyclasstext.setText(dialogText.getText());
+                                dialog.dismiss();
+
 							}
 						});
 
 			}
 		});
 
-		// 修改性别
-		spinner = (Spinner) findViewById(R.id.spinner);
-		spinner.setSelection(Currents.currentCustomer.getcSex(), true);
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+		// 修改邮箱
+		modifyemailtext.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
+			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				boolean ifsuccess = false;
-				UpdatecSex updatecsex = new UpdatecSex(Currents.currentCustomer
-						.getcID(), arg2);
-				FutureTask<Boolean> ft = new FutureTask<Boolean>(updatecsex);
-				Thread th = new Thread(ft);
-				th.start();
-				try {
-					th.join();
-					ifsuccess = ft.get();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if (ifsuccess == true) {
-					Toast.makeText(getApplicationContext(), "修改成功",
-							Toast.LENGTH_SHORT).show();
-					Currents.currentCustomer.setcSex(arg2);
-				} else {
-					Toast.makeText(getApplicationContext(), "修改失败",
-							Toast.LENGTH_SHORT).show();
-				}
+				final AlertDialog dialog = new AlertDialog.Builder(
+						PersonalMessgActivity.this).create();
+				dialog.show();
+				dialog.getWindow()
+						.clearFlags(
+								WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+										| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+				Window window = dialog.getWindow();
+				window.setContentView(R.layout.modify_email);
+
+
+				String str = modifyemailtext.getText().toString();
+				final EditText dialogText = (EditText) window
+						.findViewById(R.id.new_email_edit);
+				dialogText.setText(str);
+
+				modifyemailconfirm = (TextView) window
+						.findViewById(R.id.new_email_confirm);
+				modifyemailconfirm
+						.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								modifyemailtext.setText(dialogText.getText());
+								dialog.dismiss();
+
+							}
+						});
+
 			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
 		});
+
+
+		// 修改个人简介
+		modifyinfotext.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				final AlertDialog dialog = new AlertDialog.Builder(
+						PersonalMessgActivity.this).create();
+				dialog.show();
+				dialog.getWindow()
+						.clearFlags(
+								WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+										| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+				Window window = dialog.getWindow();
+				window.setContentView(R.layout.modify_info);
+
+
+				String str = modifyinfotext.getText().toString();
+				final EditText dialogText = (EditText) window
+						.findViewById(R.id.new_info_edit);
+				dialogText.setText(str);
+
+				modifyinfoconfirm = (TextView) window
+						.findViewById(R.id.new_info_confirm);
+				modifyinfoconfirm
+						.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								modifyinfotext.setText(dialogText.getText());
+								dialog.dismiss();
+
+							}
+						});
+
+			}
+		});
+
+
+
+
+		spinner.setEnabled(false);
 
 		// 修改密码
 		modifypwdbtn = (TextView) findViewById(R.id.per_pwd_edit);
