@@ -15,9 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.zhou.grouping.R;
+import com.example.zhou.grouping.api.UpdatePasswdAPI;
 import com.example.zhou.grouping.api.UpdatePersonalMsgAPI;
 import com.example.zhou.grouping.application.MyApplication;
-import com.example.zhou.grouping.dao.Database.UpdatePassword;
 import com.example.zhou.grouping.httpBean.Result;
 import com.example.zhou.grouping.retrofitUtil.Retrofitutil;
 
@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -81,7 +79,7 @@ public class PersonalMessgActivity extends Activity {
         modifyemailtext = (TextView) findViewById(R.id.per_email_edit);//邮箱
         modifyinfotext = (TextView) findViewById(R.id.other_introduction);//个人简介
         edit = (Button) findViewById(R.id.editing);//编辑button
-
+		csex = 0;
 
 
         // 数据
@@ -145,10 +143,14 @@ public class PersonalMessgActivity extends Activity {
 					Map<String, String> options = new HashMap<>();
 					options.put("cID", myApplication.getCustomers().getcID());
 					options.put("cName", modifyusernametext.getText().toString());
-					if(spinner.getSelectedItem().toString().equals("女"))
+					if(spinner.getSelectedItem().toString().equals("女")) {
 						options.put("cSex", "0");
-					else
+
+					}
+					else {
 						options.put("cSex", "1");
+						csex = 1;
+					}
 					options.put("cClass", modifyclasstext.getText().toString());
 					options.put("cInfo", modifyinfotext.getText().toString());
 					options.put("email", modifyemailtext.getText().toString());
@@ -167,6 +169,11 @@ public class PersonalMessgActivity extends Activity {
 										modifyinfotext.setEnabled(false);
 										edit.setText("编辑");
 										editFlag = false;
+									myApplication.getCustomers().setcName(modifyusernametext.getText().toString());
+									myApplication.getCustomers().setcSex(csex);
+									myApplication.getCustomers().setcClass(modifyclasstext.getText().toString());
+									myApplication.getCustomers().setcMail(modifyemailtext.getText().toString());
+									myApplication.getCustomers().setInfo(modifyinfotext.getText().toString());
 									Toast.makeText(
 											getApplicationContext(),
 											"修改成功",
@@ -183,49 +190,12 @@ public class PersonalMessgActivity extends Activity {
 
 
 				}
-              /*  Map<String, String> options = new HashMap<>();
-                options.put("gID", gID);
-                options.put("cID", myApplication.getCustomers().getcID());
-                options.put("sgID", sgID);
-                options.put("ifsgOwner", "0");
-                Retrofitutil.getmRetrofit()
-                        .create(JoinInSGroupAPI.class)
-                        .joinInSGroup(options)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<JoinInSGroupResult>() {
-                            @Override
-                            public void accept(@NonNull JoinInSGroupResult joinInSGroupResult) throws Exception {
-                                if (joinInSGroupResult.getResult().equals("6")) {
-                                    Toast.makeText(
-                                            getApplicationContext(),
-                                            "加入成功",
-                                            Toast.LENGTH_SHORT)
-                                            .show();
-                                    join.setVisibility(View.INVISIBLE);
-                                    quit.setVisibility(View.VISIBLE);
-                                    setAdapter();
-//																	dialog1.dismiss();
-                                } else if (joinInSGroupResult.getResult().equals("0")) {
-                                    Toast.makeText(EachZuActivity.this,
-                                            "当前群被锁定无法操作。", Toast.LENGTH_SHORT).show();
-                                } else if (joinInSGroupResult.getResult().equals("1")) {
-                                    Toast.makeText(EachZuActivity.this,
-                                            "该组人数已达上限。", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(@NonNull Throwable throwable) throws Exception {
-                                Toast.makeText(EachZuActivity.this,
-                                        throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }*/
+
                         }}
             );
 
 
 		// 修改用户名
-	//	modifyusernametext.setText(myApplication.getCustomers().getcID());
 		modifyusernametext.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -264,7 +234,6 @@ public class PersonalMessgActivity extends Activity {
 		});
 
 		// 修改行政班
-	//	modifyclasstext.setText(Currents.currentCustomer.getcClass());
 		modifyclasstext.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -415,8 +384,7 @@ public class PersonalMessgActivity extends Activity {
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
 						yuanpwdstr = yuanpwdedt.getText().toString();
-						if (yuanpwdstr.equals(Currents.currentCustomer
-								.getcPasswd())) {
+						if (yuanpwdstr.equals(myApplication.getCustomers().getcPasswd())) {
 							dialog.dismiss();
 							final AlertDialog dialog1 = new AlertDialog.Builder(
 									PersonalMessgActivity.this).create();
@@ -450,42 +418,30 @@ public class PersonalMessgActivity extends Activity {
 													.toString();
 											if (newpwdstr1.equals(newpwdstr2)) {
 												boolean ifsuccess = false;
-												UpdatePassword updatepassword = new UpdatePassword(
-														Currents.currentCustomer
-																.getcID(),
-														newpwdstr1);
-												FutureTask<Boolean> ft = new FutureTask<Boolean>(
-														updatepassword);
-												Thread th = new Thread(ft);
-												th.start();
-												try {
-													th.join();
-													ifsuccess = ft.get();
-												} catch (InterruptedException e) {
-													// TODO Auto-generated catch
-													e.printStackTrace();
-												} catch (ExecutionException e) {
-													// TODO Auto-generated catch
-													e.printStackTrace();
-												}
-												if (ifsuccess == true) {
-													dialog1.dismiss();
-													Toast.makeText(
-															getApplicationContext(),
-															"修改成功" + newpwdstr1
-																	+ ifsuccess,
-															Toast.LENGTH_SHORT)
-															.show();
-													Currents.currentCustomer
-															.setcPasswd(newpwdstr1);
-												} else {
-													Toast.makeText(
-															getApplicationContext(),
-															"修改失败" + newpwdstr1
-																	+ ifsuccess,
-															Toast.LENGTH_SHORT)
-															.show();
-												}
+												Retrofitutil.getmRetrofit()
+														.create(UpdatePasswdAPI.class)
+														.updatePasswd(myApplication.getCustomers().getcID(),newpwdstr1)
+														.subscribeOn(Schedulers.io())
+														.observeOn(AndroidSchedulers.mainThread())
+														.subscribe(new Consumer<Result>() {
+															@Override
+															public void accept(@NonNull Result result) throws Exception {
+																dialog1.dismiss();
+																Toast.makeText(
+																		getApplicationContext(),
+																		"修改成功",
+																		Toast.LENGTH_SHORT)
+																		.show();
+																myApplication.getCustomers().setcPasswd(newpwdstr1);
+
+															}
+														}, new Consumer<Throwable>() {
+															@Override
+															public void accept(@NonNull Throwable throwable) throws Exception {
+																Toast.makeText(PersonalMessgActivity.this,
+																		throwable.getMessage(), Toast.LENGTH_SHORT).show();
+															}
+														});
 											} else {
 												dialog.dismiss();
 												Toast.makeText(

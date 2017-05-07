@@ -13,8 +13,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -25,6 +23,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.zhou.grouping.R;
+import com.example.zhou.grouping.api.CloseGroupAPI;
 import com.example.zhou.grouping.api.CreateNewSGroupAPI;
 import com.example.zhou.grouping.api.DeleteGroupAPI;
 import com.example.zhou.grouping.api.ExitFromGAndDeleteSGAPI;
@@ -32,14 +31,9 @@ import com.example.zhou.grouping.api.ExitFromGroupAndSGroupAPI;
 import com.example.zhou.grouping.api.IfOwnerOfGroupAPI;
 import com.example.zhou.grouping.api.LoadGroupMembersAPI;
 import com.example.zhou.grouping.api.LoadSGroupAPI;
+import com.example.zhou.grouping.api.SelectIfOpenAPI;
 import com.example.zhou.grouping.api.SelectIfsgOwnerOfSGroupAPI;
 import com.example.zhou.grouping.application.MyApplication;
-import com.example.zhou.grouping.dao.Database.CreateNewSGroup;
-import com.example.zhou.grouping.dao.Database.JoinInSGroup;
-import com.example.zhou.grouping.dao.Database.SelectIfOpen;
-import com.example.zhou.grouping.dao.Database.SelectMaxSGroupID;
-import com.example.zhou.grouping.dao.Database.SelectNotInSGroup;
-import com.example.zhou.grouping.dao.Database.UpdateIfOpen;
 import com.example.zhou.grouping.httpBean.CreateNewSGroupResult;
 import com.example.zhou.grouping.httpBean.GroupMembers;
 import com.example.zhou.grouping.httpBean.LoadGroups;
@@ -52,8 +46,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -784,47 +776,37 @@ public class AllZuActivity extends Activity {
 
                 @Override
                 public void onClick(View v) {
-                    // TODO Auto-generated method stub
-
-                    // 获取群状态
-                    SelectIfOpen selectifopen = new SelectIfOpen(
-                            Currents.currentSGroup.getgID());
-                    FutureTask<Boolean> ft1 = new FutureTask<Boolean>(
-                            selectifopen);
-                    Thread th1 = new Thread(ft1);
-                    th1.start();
-                    try {
-                        Currents.groupstate = ft1.get();
-                        th1.join();
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
+                    // TODO Auto-generated method
                     final AlertDialog dialog = new AlertDialog.Builder(
                             AllZuActivity.this).create();
-                    dialog.show();
                     Window window = dialog.getWindow();
+                    dialog.show();
                     window.setContentView(R.layout.grp_state);
-
                     mTogBtn = (ToggleButton) window.findViewById(R.id.mTogBtn); // 获取到控件
-                    mTogBtn.setChecked(Currents.groupstate);
-                    TBGroupState = Currents.groupstate;
-                    mTogBtn.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+                    Retrofitutil.getmRetrofit()
+                            .create(SelectIfOpenAPI.class)
+                            .selectIfOpen(group.getGID())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<com.example.zhou.grouping.httpBean.SelectIfOpen>() {
+                                @Override
+                                public void accept(@NonNull com.example.zhou.grouping.httpBean.SelectIfOpen selectIfOpen) throws Exception {
+                                    if(selectIfOpen.getIfOpen().equals("1")){
+                                        mTogBtn.setChecked(true);
+                                    }
+                                    else{
+                                        mTogBtn.setChecked(false);
 
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView,
-                                                     boolean isChecked) {
-                            // TODO Auto-generated method stub
+                                    }
 
-                            mTogBtn.setChecked(isChecked);
-                            TBGroupState = isChecked;
-
-                        }
-                    });// mTogBtn添加监听事件
+                                }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(@NonNull Throwable throwable) throws Exception {
+                                    Toast.makeText(AllZuActivity.this,
+                                            throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
                     GroupStateConfirm = (TextView) window
                             .findViewById(R.id.grp_state_modify_confirm);
@@ -834,130 +816,35 @@ public class AllZuActivity extends Activity {
                                 @Override
                                 public void onClick(View arg0) {
                                     // TODO Auto-generated method stub
-                                    if (TBGroupState == true) {
-                                        // 选中，左滑，显示灰色,true
-                                        UpdateIfOpen updateifopen = new UpdateIfOpen(
-                                                Currents.currentGroup.getgID(),
-                                                1);
-                                        FutureTask<Boolean> ft = new FutureTask<Boolean>(
-                                                updateifopen);
-                                        Thread th = new Thread(ft);
-                                        th.start();
-                                        try {
-                                            th.join();
-                                        } catch (InterruptedException e1) {
-                                            // TODO Auto-generated catch block
-                                            e1.printStackTrace();
-                                        }
-
-                                    } else {
-                                        // 未选中，向右划，显示绿色,false
-                                        UpdateIfOpen updateifopen = new UpdateIfOpen(
-                                                Currents.currentGroup.getgID(),
-                                                0);
-                                        FutureTask<Boolean> ft = new FutureTask<Boolean>(
-                                                updateifopen);
-                                        Thread th = new Thread(ft);
-                                        th.start();
-                                        try {
-                                            th.join();
-                                        } catch (InterruptedException e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        }
-
-                                        // 获取人员名单
-                                        SelectNotInSGroup selectnotinsgroup = new SelectNotInSGroup(
-                                                Currents.currentGroup.getgID());
-                                        FutureTask<Boolean> ft1 = new FutureTask<Boolean>(
-                                                selectnotinsgroup);
-                                        Thread th1 = new Thread(ft1);
-                                        th1.start();
-                                        try {
-                                            th1.join();
-                                        } catch (InterruptedException e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        }
-                                        int size = Currents.NotInSGroupCustomer
-                                                .size();
-                                        if (size != 0) {
-                                            int i = 0, tempSGroup = 0;
-                                            for (i = 0; i < size; i++) {
-                                                if ((i)
-                                                        % (Currents.currentGroup
-                                                        .getgMax()) == 0) {
-                                                    // 将下标为i的用户新建组
-                                                    CreateNewSGroup createnewsgroup = new CreateNewSGroup(
-                                                            Currents.currentGroup
-                                                                    .getgID(),
-                                                            Currents.NotInSGroupCustomer
-                                                                    .get(i)
-                                                                    .getcID(),
-                                                            1);
-                                                    FutureTask<Boolean> ft2 = new FutureTask<Boolean>(
-                                                            createnewsgroup);
-                                                    Thread th2 = new Thread(ft2);
-                                                    th2.start();
-                                                    try {
-                                                        th2.join();
-                                                    } catch (InterruptedException e) {
-                                                        // TODO Auto-generated
-                                                        // catch
-                                                        e.printStackTrace();
+                                    if(mTogBtn.isChecked()){
+                                        //开启群
+                                    }else {
+                                        //关闭群
+                                        Retrofitutil.getJAVAmRetrofit().create(CloseGroupAPI.class)
+                                                .closeGroup(group.getGID())
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(new Consumer<Result>() {
+                                                    @Override
+                                                    public void accept(@NonNull Result result) throws Exception {
+                                                        if (result.isResult()) {
+                                                            Toast.makeText(AllZuActivity.this, "修改成功",
+                                                                    Toast.LENGTH_SHORT).show();
+                                                            dialog.dismiss();
+                                                            loadSGroup();
+                                                        }
                                                     }
-
-                                                    // 将新建组的组号标记在tempSGroup
-                                                    SelectMaxSGroupID selectmaxsgroupid = new SelectMaxSGroupID(
-                                                            Currents.currentGroup
-                                                                    .getgID());
-                                                    FutureTask<Boolean> ft3 = new FutureTask<Boolean>(
-                                                            selectmaxsgroupid);
-                                                    Thread th3 = new Thread(ft3);
-                                                    th3.start();
-                                                    try {
-                                                        th3.join();
-                                                        tempSGroup = Currents.maxsgid;
-                                                    } catch (InterruptedException e) {
-                                                        // TODO Auto-generated
-                                                        // catch
-                                                        e.printStackTrace();
+                                                }, new Consumer<Throwable>() {
+                                                    @Override
+                                                    public void accept(@NonNull Throwable throwable) throws Exception {
+                                                        Toast.makeText(AllZuActivity.this, throwable.getMessage(),
+                                                                Toast.LENGTH_SHORT).show();
+                                                        dialog.dismiss();
+                                                        loadSGroup();
                                                     }
-
-                                                } else {
-                                                    // 将下标为i的用户加入组
-                                                    JoinInSGroup joininsgroup = new JoinInSGroup(
-                                                            tempSGroup,
-                                                            Currents.NotInSGroupCustomer
-                                                                    .get(i)
-                                                                    .getcID(),
-                                                            Currents.currentGroup
-                                                                    .getgID(),
-                                                            0);
-                                                    FutureTask<Boolean> ft4 = new FutureTask<Boolean>(
-                                                            joininsgroup);
-                                                    Thread th4 = new Thread(ft4);
-                                                    th4.start();
-                                                    try {
-                                                        th4.join();
-                                                    } catch (InterruptedException e) {
-                                                        // TODO Auto-generated
-                                                        // catch
-                                                        // block
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                            }
-
-                                            // 更新列表
-//                                            setGroupAdapter();
-                                        } else {
-                                        }
-
+                                                });
                                     }
-                                    Toast.makeText(AllZuActivity.this, "修改成功",
-                                            Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
+
                                 }
                             });
                 }

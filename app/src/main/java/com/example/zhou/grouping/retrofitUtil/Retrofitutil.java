@@ -23,4 +23,14 @@ public class Retrofitutil {
         return mRetrofit;
     }
 
+    public static final String API_BASE_URL_JAVA = "http://192.168.1.3:8080/";
+
+    private static Retrofit mRetrofitJAVA = new Retrofit.Builder().
+            baseUrl(API_BASE_URL_JAVA)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
+    public static Retrofit getJAVAmRetrofit() {
+        return mRetrofitJAVA;
+    }
+
 }
